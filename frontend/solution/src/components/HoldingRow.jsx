@@ -5,11 +5,11 @@ import {
   formatNumber,
   formatPercent,
   isNumber,
-  toPercent,
   trend,
   withSign,
 } from '../portfolio/format'
 
+// Numeric cell coloured by the sign of `value` (raw CAD), with a ▲/▼ for gains and losses
 function TrendCell({ value, children }) {
   const tone = trend(value)
   return (
@@ -20,19 +20,21 @@ function TrendCell({ value, children }) {
   )
 }
 
+// One holdings table row, linking to that holding's detail page (/accounts/:accountId/holdings/:ticker).
+// Money columns (price, market value, day change, gain/loss) go through useCurrency so they follow
+// the CAD/USD toggle; quantity and percentages are shown as-is.
 export default function HoldingRow({ holding }) {
   const { formatMoney, formatSignedMoney } = useCurrency()
   const { accountId } = useParams()
   const navigate = useNavigate()
   const { search } = useLocation()
-  const { ticker, name, assetClass, quantity, price, marketValue, weightPercent, unrealizedGainLoss } = holding
+  const { ticker, name, assetClass, quantity, price, marketValue, weightPercent, gainLoss } = holding
   const { dayChangeAmount, dayChangePercent } = holding
 
-  // Holding percentages are decimals (0.0032 => 0.32%), unlike the portfolio's dayChangePercent
-  const dayPercent = toPercent(dayChangePercent)
+  // Holding weightPercent and dayChangePercent are already percents (2.4 => 2.4%), see PORTFOLIO-API.md
   const dayChange = `${formatSignedMoney(dayChangeAmount)} (${withSign(
-    dayPercent,
-    formatPercent(dayPercent),
+    dayChangePercent,
+    formatPercent(dayChangePercent),
   )})`
 
   // Keep ?scenario= etc. so the detail page loads from the same dataset
@@ -51,11 +53,9 @@ export default function HoldingRow({ holding }) {
       <td className="holdings-table__num">{formatNumber(quantity)}</td>
       <td className="holdings-table__num">{formatMoney(price)}</td>
       <td className="holdings-table__num">{formatMoney(marketValue)}</td>
-      <td className="holdings-table__num">{formatPercent(toPercent(weightPercent))}</td>
-      <TrendCell value={isNumber(dayChangeAmount) ? dayChangeAmount : dayPercent}>{dayChange}</TrendCell>
-      <TrendCell value={unrealizedGainLoss}>
-        {formatSignedMoney(unrealizedGainLoss)}
-      </TrendCell>
+      <td className="holdings-table__num">{formatPercent(weightPercent)}</td>
+      <TrendCell value={isNumber(dayChangeAmount) ? dayChangeAmount : dayChangePercent}>{dayChange}</TrendCell>
+      <TrendCell value={gainLoss}>{formatSignedMoney(gainLoss)}</TrendCell>
     </tr>
   )
 }

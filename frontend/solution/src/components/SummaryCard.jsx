@@ -11,6 +11,7 @@ import {
   withSign,
 } from '../portfolio/format'
 
+// One labelled figure in the summary; `tone` colours it and adds a ▲/▼ for positive/negative
 function Stat({ label, value, tone = 'neutral' }) {
   return (
     <div className={`summary-card__stat summary-card__stat--${tone}`}>
@@ -23,17 +24,28 @@ function Stat({ label, value, tone = 'neutral' }) {
   )
 }
 
-// Shows the selected account by default; pass `summary` to show other figures (e.g. all accounts combined)
-export default function SummaryCard({ summary, loading, showTotalReturn = true }) {
-  const { status, data } = useContext(PortfolioContext) ?? {}
+// At-a-glance figures: market value, day change ($ and %) and, optionally, total return.
+// By default it shows the selected account from PortfolioContext (with its loading and error
+// states); pass `summary` (+ `loading`) to show other figures, e.g. all accounts combined.
+// Money follows the CAD/USD toggle.
+export default function SummaryCard({ summary, loading = false, showTotalReturn = true }) {
+  const { status, data, error } = useContext(PortfolioContext) ?? {}
   const { formatMoney, formatSignedMoney } = useCurrency()
-  const isLoading = summary === undefined ? status === 'loading' && !data : loading
+  const usesContext = summary === undefined
 
-  if (isLoading) {
+  if (usesContext && status === 'error') {
+    return (
+      <section className="summary-card" role="alert">
+        Could not load portfolio: {error?.message ?? 'unknown error'}
+      </section>
+    )
+  }
+
+  if (usesContext ? !data : loading) {
     return <section className="summary-card">Loading portfolio…</section>
   }
 
-  const portfolio = summary ?? data?.portfolio ?? {}
+  const portfolio = (usesContext ? data.portfolio : summary) ?? {}
   // Money fields are CAD from the API; useCurrency converts them to the selected currency
   const { totalMarketValue, dayChangeAmount, dayChangePercent, totalReturnSinceInception } = portfolio
 

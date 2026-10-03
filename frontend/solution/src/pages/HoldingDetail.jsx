@@ -3,18 +3,17 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import HistoryChart from '../components/HistoryChart'
 import useCurrency from '../currency/useCurrency'
 import { fetchHoldingDetail } from '../portfolio/api'
-import { formatNumber, formatPercent, isNumber, toPercent, trend } from '../portfolio/format'
+import { NOT_FOUND, formatNumber, formatPercent, isNumber, toPercent, trend } from '../portfolio/format'
 import { fromPriceHistory } from '../portfolio/history'
 import { PortfolioContext } from '../portfolio/PortfolioContext'
 
-const MISSING = '—'
+// Optional fields (no purchase date, sector, ...) render as "Not found" instead of "undefined"
+const orMissing = (value, format) => (value === null || value === undefined ? NOT_FOUND : format(value))
 
-// Optional fields (no dividend, no purchase date, ...) render as a dash instead of "undefined"
-const orMissing = (value, format) => (value === null || value === undefined ? MISSING : format(value))
-
+// 'YYYY-MM-DD' => "Mar 14, 2022" (same en-CA locale as money)
 function formatDate(date) {
   // Date-only strings are UTC; format them in UTC so the day doesn't shift
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString(undefined, {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -22,6 +21,7 @@ function formatDate(date) {
   })
 }
 
+// One labelled figure; `tone` (positive/negative/neutral) colours it like the summary card
 function Stat({ label, value, tone }) {
   return (
     <div className={tone ? `summary-card__stat summary-card__stat--${tone}` : 'summary-card__stat'}>
@@ -114,7 +114,6 @@ export default function HoldingDetail() {
   const totalCost = isNumber(costBasis) && isNumber(quantity) ? costBasis * quantity : null
   const gainLoss =
     holding?.gainLoss ??
-    holding?.unrealizedGainLoss ??
     (isNumber(price) && isNumber(totalCost) ? price * quantity - totalCost : null)
   const returnPercent = isNumber(gainLoss) && isNumber(totalCost) && totalCost !== 0 ? (gainLoss / totalCost) * 100 : null
 
@@ -156,8 +155,8 @@ export default function HoldingDetail() {
         <section className="summary-card" aria-label="Security details">
           <h2 className="summary-card__title">Security details</h2>
           <dl className="summary-card__stats">
-            <Stat label="Sector" value={security.sector ?? MISSING} />
-            <Stat label="Asset class" value={security.assetClass ?? MISSING} />
+            <Stat label="Sector" value={security.sector ?? NOT_FOUND} />
+            <Stat label="Asset class" value={security.assetClass ?? NOT_FOUND} />
             <Stat
               label="Dividend yield"
               value={isNumber(security.dividendYield) ? formatPercent(toPercent(security.dividendYield)) : 'None'}
