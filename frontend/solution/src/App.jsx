@@ -3,6 +3,7 @@ import Layout from './components/Layout'
 import Home from './pages/Home'
 import AccountDetail from './pages/AccountDetail'
 import HoldingDetail from './pages/HoldingDetail'
+import TradePage from './pages/TradePage'
 import PortfolioProvider from './portfolio/PortfolioProvider'
 
 // Routes of the app. PortfolioProvider wraps them so the selected account survives navigation;
@@ -17,6 +18,8 @@ export default function App() {
           <Route path="accounts" element={<Navigate to="/" replace />} />
           <Route path="accounts/:accountId" element={<AccountDetail />} />
           <Route path="accounts/:accountId/holdings/:ticker" element={<HoldingDetail />} />
+          <Route path="accounts/:accountId/holdings/:ticker/buy" element={<TradePage side="buy" />} />
+          <Route path="accounts/:accountId/holdings/:ticker/sell" element={<TradePage side="sell" />} />
         </Route>
       </Routes>
     </PortfolioProvider>

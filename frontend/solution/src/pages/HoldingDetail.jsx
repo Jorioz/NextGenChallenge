@@ -143,6 +143,15 @@ export default function HoldingDetail() {
 
       <HistoryChart histories={histories} title="Price history" />
 
+      <div className="trade-actions">
+        <Link to={`buy${search}`} relative="path" className="trade-button trade-button--buy">
+          Buy
+        </Link>
+        <Link to={`sell${search}`} relative="path" className="trade-button trade-button--sell">
+          Sell
+        </Link>
+      </div>
+
       <section className="card" aria-labelledby="position-title">
         <h2 id="position-title" className="section-title">
           Your position

@@ -465,3 +465,33 @@ body {
   background: var(--accent);
   transform: translate(-50%, -50%);
 }
+
+.trade-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+
+.trade-button {
+  display: block;
+  padding: 14px 16px;
+  border-radius: var(--radius);
+  color: #fff;
+  font-size: 1.1rem;
+  font-weight: 600;
+  text-align: center;
+  text-decoration: none;
+}
+
+.trade-button:hover {
+  opacity: 0.9;
+}
+
+.trade-button--buy {
+  background: var(--positive);
+}
+
+.trade-button--sell {
+  background: var(--negative);
+}
