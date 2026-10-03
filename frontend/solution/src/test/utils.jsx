@@ -77,7 +77,12 @@ export const SAMPLE_PORTFOLIO = {
       weightPercent: 32.93,
     },
   ],
-  allocation: [],
+  allocation: [
+    { assetClass: 'Equity', value: 31050 },
+    { assetClass: 'Fixed Income', value: 21630 },
+    { assetClass: 'Cash', value: 8000 },
+    { assetClass: 'Alternatives', value: 5000 },
+  ],
   performanceHistory: [
     { date: '2026-10-01', marketValue: 65000 },
     { date: '2026-10-02', marketValue: 65283.75 },
