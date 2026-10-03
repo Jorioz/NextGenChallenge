@@ -1,6 +1,6 @@
 import { useContext, useEffect, useMemo } from 'react'
 import { Link, useParams } from 'react-router-dom'
-import HoldingsTable from '../components/HoldingsTable'
+import HoldingsList from '../components/HoldingsList'
 import HistoryChart from '../components/HistoryChart'
 import SummaryCard from '../components/SummaryCard'
 import { PortfolioContext } from '../portfolio/PortfolioContext'
@@ -29,12 +29,12 @@ export default function AccountDetail() {
       {isCurrent && status === 'error' && <p role="alert">{error.message}</p>}
       {isCurrent && status === 'success' && (
         <>
-          <h1>{data.portfolio?.label ?? accountId}</h1>
+          <h1 className="page-title">{data.portfolio?.label ?? accountId}</h1>
           <section className="overview-panel" aria-label="Account overview">
             <SummaryCard />
-            <HistoryChart histories={histories} title="Account value" />
+            <HistoryChart histories={histories} title="Account value" simple />
           </section>
-          <HoldingsTable />
+          <HoldingsList />
         </>
       )}
     </>
