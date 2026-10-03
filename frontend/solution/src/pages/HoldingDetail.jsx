@@ -3,18 +3,17 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import HistoryChart from '../components/HistoryChart'
 import useCurrency from '../currency/useCurrency'
 import { fetchHoldingDetail } from '../portfolio/api'
-import { TREND_ICON, formatNumber, formatPercent, isNumber, toPercent, trend, withSign } from '../portfolio/format'
+import { NOT_FOUND, TREND_ICON, formatNumber, formatPercent, isNumber, toPercent, trend, withSign } from '../portfolio/format'
 import { fromPriceHistory } from '../portfolio/history'
 import { PortfolioContext } from '../portfolio/PortfolioContext'
 
-const MISSING = '—'
+// Optional fields (no purchase date, sector, ...) render as "Not found" instead of "undefined"
+const orMissing = (value, format) => (value === null || value === undefined ? NOT_FOUND : format(value))
 
-// Optional fields (no dividend, no purchase date, ...) render as a dash instead of "undefined"
-const orMissing = (value, format) => (value === null || value === undefined ? MISSING : format(value))
-
+// 'YYYY-MM-DD' => "Mar 14, 2022" (same en-CA locale as money)
 function formatDate(date) {
   // Date-only strings are UTC; format them in UTC so the day doesn't shift
-  return new Date(`${date}T00:00:00Z`).toLocaleDateString(undefined, {
+  return new Date(`${date}T00:00:00Z`).toLocaleDateString('en-CA', {
     year: 'numeric',
     month: 'short',
     day: 'numeric',
@@ -22,6 +21,7 @@ function formatDate(date) {
   })
 }
 
+// One labelled figure; `tone` (positive/negative/neutral) colours it like the summary card
 function Stat({ label, value, tone }) {
   return (
     <div className={tone ? `stat trend--${tone}` : 'stat'}>
@@ -114,13 +114,12 @@ export default function HoldingDetail() {
   const totalCost = isNumber(costBasis) && isNumber(quantity) ? costBasis * quantity : null
   const gainLoss =
     holding?.gainLoss ??
-    holding?.unrealizedGainLoss ??
     (isNumber(price) && isNumber(totalCost) ? price * quantity - totalCost : null)
   const returnPercent = isNumber(gainLoss) && isNumber(totalCost) && totalCost !== 0 ? (gainLoss / totalCost) * 100 : null
 
   const marketValue = holding?.marketValue ?? (isNumber(price) && isNumber(quantity) ? price * quantity : null)
-  // Holding percentages are decimals (0.0032 => 0.32%)
-  const dayPercent = toPercent(holding?.dayChangePercent)
+  // Holding dayChangePercent and weightPercent are already percents (2.4 => 2.4%), see PORTFOLIO-API.md
+  const dayPercent = holding?.dayChangePercent
   const dayAmount = holding?.dayChangeAmount
   const dayTone = trend(isNumber(dayAmount) ? dayAmount : dayPercent)
   const hasDayChange = isNumber(dayAmount) || isNumber(dayPercent)
@@ -168,7 +167,7 @@ export default function HoldingDetail() {
               <Stat label="Shares" value={orMissing(quantity, formatNumber)} />
               <Stat label="Avg cost / share" value={formatMoney(costBasis)} />
               <Stat label="Total cost" value={formatMoney(totalCost)} />
-              <Stat label="Weight in account" value={orMissing(toPercent(holding?.weightPercent), formatPercent)} />
+              <Stat label="Weight in account" value={orMissing(holding?.weightPercent, formatPercent)} />
               <Stat label="Purchased" value={orMissing(security.purchaseDate, formatDate)} />
             </dl>
           </>
@@ -180,8 +179,8 @@ export default function HoldingDetail() {
           About {security.ticker}
         </h2>
         <dl className="stats">
-          <Stat label="Asset class" value={security.assetClass ?? MISSING} />
-          <Stat label="Sector" value={security.sector ?? MISSING} />
+          <Stat label="Asset class" value={security.assetClass ?? NOT_FOUND} />
+          <Stat label="Sector" value={security.sector ?? NOT_FOUND} />
           <Stat
             label="Dividend yield"
             value={isNumber(security.dividendYield) ? formatPercent(toPercent(security.dividendYield)) : 'None'}

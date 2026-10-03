@@ -1,14 +1,16 @@
 import { useContext, useEffect, useMemo } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import HoldingsList from '../components/HoldingsList'
 import HistoryChart from '../components/HistoryChart'
 import SummaryCard from '../components/SummaryCard'
 import { PortfolioContext } from '../portfolio/PortfolioContext'
 import { fromPerformanceHistory } from '../portfolio/history'
 
-// One account's figures, value history and holdings
+// One account's figures, value history and holdings, for the account in the URL
+// (/accounts/:accountId). Selecting it in PortfolioProvider triggers the load.
 export default function AccountDetail() {
   const { accountId } = useParams()
+  const { search } = useLocation()
   const { accountId: selectedId, selectAccount, status, data, error } = useContext(PortfolioContext)
 
   // The URL is the source of truth; sync it into the provider that loads the portfolio
@@ -22,7 +24,7 @@ export default function AccountDetail() {
 
   return (
     <>
-      <Link to="/" className="back-link">
+      <Link to={{ pathname: '/', search }} className="back-link">
         ← All accounts
       </Link>
       {!isCurrent && <p>Loading account…</p>}
