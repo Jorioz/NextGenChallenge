@@ -39,7 +39,7 @@ export default function OverviewPanel({ status, portfolios, error }) {
       {!hasNothingToShow && <SummaryCard summary={summary} loading={isLoading} showTotalReturn={false} />}
       {status === 'error' && <p role="alert">{error.message}</p>}
       {portfolios.length > 0 && (
-        <HistoryChart histories={histories} title="Total value (all accounts)" />
+        <HistoryChart histories={histories} title="Total value (all accounts)" simple />
       )}
     </section>
   )

@@ -53,20 +53,31 @@ describe('HoldingDetail page', () => {
     renderDetail({ portfolio: makePortfolio({ data: SAMPLE_PORTFOLIO, selectAccount }) })
 
     expect(screen.getByText('Loading AAPL…')).toBeInTheDocument()
-    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('AAPLApple Inc.')
+    expect(await screen.findByRole('heading', { level: 1 })).toHaveTextContent('AAPL Apple Inc.')
     expect(selectAccount).toHaveBeenCalledWith('P-9001')
     expect(fetchHoldingDetail).toHaveBeenCalledWith('AAPL', expect.objectContaining({ signal: expect.any(AbortSignal) }))
+  })
+
+  test("leads with the price and today's change", async () => {
+    renderDetail()
+    await screen.findByRole('heading', { level: 1 })
+    expect(document.querySelector('.hero__value')).toHaveTextContent('$227.50 CAD')
+    // dayChangePercent is already a percent (2.4 => 2.40%)
+    expect(document.querySelector('.hero__change')).toHaveTextContent('▲ +$639.60 CAD (+2.40%) today')
   })
 
   test("shows the account's position with cost, gain and return", async () => {
     renderDetail()
     await screen.findByRole('heading', { level: 1 })
 
+    expect(stat('Market value')).toHaveTextContent('$27,300.00 CAD')
     expect(stat('Shares')).toHaveTextContent('120')
-    expect(stat('Cost basis / share')).toHaveTextContent('$200.00 CAD')
+    expect(stat('Avg cost / share')).toHaveTextContent('$200.00 CAD')
     expect(stat('Total cost')).toHaveTextContent('$24,000.00 CAD')
     // gainLoss from the portfolio row; 3,300 / 24,000 = 13.75%
-    expect(stat('Unrealized gain/loss')).toHaveTextContent('+$3,300.00 CAD (13.75%)')
+    expect(stat('Unrealized gain/loss')).toHaveTextContent('+$3,300.00 CAD (+13.75%)')
+    // weightPercent is already a percent
+    expect(stat('Weight in account')).toHaveTextContent('41.57%')
     expect(stat('Purchased')).toHaveTextContent('Mar 14, 2022')
   })
 
@@ -76,7 +87,8 @@ describe('HoldingDetail page', () => {
 
     expect(stat('Sector')).toHaveTextContent('Technology')
     expect(stat('Dividend yield')).toHaveTextContent('0.50%')
-    expect(stat('52-week high')).toHaveTextContent('$232.40 CAD')
+    expect(stat('Asset class')).toHaveTextContent('Equity')
+    expect(screen.getByText('$232.40 CAD')).toBeInTheDocument()
     expect(screen.getByRole('img', { name: 'Current price $227.50 CAD' })).toBeInTheDocument()
     expect(screen.getByText('Price history: 2 points')).toBeInTheDocument()
   })
@@ -84,7 +96,7 @@ describe('HoldingDetail page', () => {
   test('converts money to USD', async () => {
     renderDetail({ currency: makeCurrency({ currency: 'USD' }) })
     await screen.findByRole('heading', { level: 1 })
-    expect(stat('Cost basis / share')).toHaveTextContent('$146.00 USD')
+    expect(stat('Avg cost / share')).toHaveTextContent('$146.00 USD')
   })
 
   test('handles a security with no dividend or optional fields', async () => {

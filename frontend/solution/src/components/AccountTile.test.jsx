@@ -6,14 +6,14 @@ import AccountTile from './AccountTile'
 const { portfolio } = SAMPLE_PORTFOLIO
 
 describe('AccountTile', () => {
-  test('shows label, value and day change, linking to the account', () => {
+  test("shows label, value and today's % change, linking to the account", () => {
     renderWithContext(<AccountTile accountId="P-9001" portfolio={portfolio} />)
     const link = screen.getByRole('link')
 
     expect(link).toHaveAttribute('href', '/accounts/P-9001')
     expect(link).toHaveTextContent('Taxable Brokerage')
     expect(link).toHaveTextContent('$65,680.00 CAD')
-    expect(link).toHaveTextContent('▲ +$397.25 CAD today')
+    expect(link).toHaveTextContent('▲ +0.61%')
   })
 
   test('converts money to USD', () => {
@@ -31,6 +31,6 @@ describe('AccountTile', () => {
   test('shows Not found for missing fields and a neutral change', () => {
     const { container } = renderWithContext(<AccountTile accountId="P-9001" />)
     expect(screen.getByRole('link')).toHaveTextContent('Not found')
-    expect(container.querySelector('.account-tile__change--neutral')).toBeInTheDocument()
+    expect(container.querySelector('.list-row__change.trend--neutral')).toBeInTheDocument()
   })
 })

@@ -16,9 +16,9 @@ export default function AllocationChart({ allocation, title = 'Asset allocation'
 
   if (slices.length === 0) {
     return (
-      <section className="allocation-chart" aria-label={title}>
-        <h2 className="allocation-chart__title">{title}</h2>
-        <p>No allocation data for this account.</p>
+      <section className="card allocation-chart" aria-label={title}>
+        <h2 className="section-title">{title}</h2>
+        <p className="empty">No allocation data for this account.</p>
       </section>
     )
   }
@@ -56,8 +56,8 @@ export default function AllocationChart({ allocation, title = 'Asset allocation'
   const summary = slices.map((slice) => `${slice.assetClass} ${formatShare(slice.percent)}`).join(', ')
 
   return (
-    <section className="allocation-chart" aria-label={title}>
-      <h2 className="allocation-chart__title">{title}</h2>
+    <section className="card allocation-chart" aria-label={title}>
+      <h2 className="section-title">{title}</h2>
       <div className="allocation-chart__body">
         <div className="allocation-chart__canvas">
           <Pie data={data} options={options} role="img" aria-label={`${title}: ${summary}`} />

@@ -22,10 +22,10 @@ describe('Home page', () => {
     usePortfolios.mockReturnValue({ status: 'success', portfolios: PORTFOLIOS, error: null })
   })
 
-  test('shows the combined overview and one tile per account', () => {
+  test('shows the combined overview and one row per account', () => {
     renderWithContext(<Home />)
     expect(screen.getByRole('heading', { name: 'Portfolio Overview' })).toBeInTheDocument()
-    expect(screen.getByRole('heading', { name: 'All accounts' })).toBeInTheDocument()
+    expect(screen.getByText('Total value')).toBeInTheDocument()
     expect(screen.getByText('Total value (all accounts): 2 accounts')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /Taxable Brokerage/ })).toHaveAttribute('href', '/accounts/P-9001')
     expect(screen.getByRole('link', { name: /Retirement Account/ })).toHaveAttribute('href', '/accounts/P-9002')

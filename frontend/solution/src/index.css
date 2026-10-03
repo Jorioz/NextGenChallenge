@@ -1,11 +1,46 @@
+:root {
+  --bg: #f6f7f9;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+  --divider: #f0f1f3;
+  --text: #111827;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-soft: #eff4ff;
+  --positive: #15803d;
+  --negative: #b91c1c;
+  --radius: 12px;
+}
+
 * {
   box-sizing: border-box;
 }
 
 body {
   margin: 0;
-  font-family: system-ui, sans-serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+  color: var(--text);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
 }
+
+/* Numbers line up and don't jitter when values change */
+.hero__value,
+.hero__change,
+.list-row__figures,
+.stat dd {
+  font-variant-numeric: tabular-nums;
+}
+
+.trend--positive {
+  color: var(--positive);
+}
+
+.trend--negative {
+  color: var(--negative);
+}
+
+/* ---------- Shell ---------- */
 
 .layout {
   min-height: 100vh;
@@ -17,25 +52,80 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.5rem;
-  border-bottom: 1px solid #ddd;
+  padding: 0.875rem 1.5rem;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.01em;
 }
 
 .navbar nav a {
   margin-left: 1rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-weight: 500;
 }
 
+.navbar nav a.active {
+  color: var(--text);
+}
+
+/* Narrow reading column keeps each page focused */
 .main {
   flex: 1;
-  padding: 1.5rem;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 1.5rem 1rem 4rem;
 }
 
 .footer {
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #ddd;
+  padding: 1rem 9rem 1rem 1.5rem; /* right padding clears the floating currency switch */
+  color: var(--muted);
+  border-top: 1px solid var(--border);
 }
 
-/* Floating currency switch: fixed so it stays visible without scrolling */
+.page-title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--muted);
+}
+
+.section-title {
+  margin: 0 0 0.75rem;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.back-link {
+  display: inline-block;
+  margin-bottom: 1rem;
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.9rem;
+}
+
+.back-link:hover {
+  color: var(--accent);
+}
+
+.empty {
+  margin: 0;
+  padding: 1rem 0;
+  color: var(--muted);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ---------- Floating currency switch ---------- */
+
 .currency-toggle {
   position: fixed;
   right: 1rem;
@@ -81,53 +171,84 @@ body {
   cursor: not-allowed;
 }
 
-.currency-toggle button:focus-visible {
-  outline: 2px solid #2563eb;
-  outline-offset: 2px;
-}
+/* ---------- Cards ---------- */
 
-/* Keep footer text clear of the floating switch */
-.footer {
-  padding-right: 9rem;
-}
-
+.card,
 .overview-panel {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-/* Inner sections drop their own card styling; a divider separates them */
-.overview-panel .summary-card,
-.overview-panel .value-chart {
-  margin-top: 0;
-  border: none;
-  border-radius: 0;
-}
-
-.overview-panel .value-chart {
-  border-top: 1px solid #ddd;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
 }
 
 .overview-panel > p {
-  margin: 0;
-  padding: 1rem 1.5rem;
-  border-top: 1px solid #ddd;
+  margin: 1rem 0 0;
 }
 
-.summary-card {
-  padding: 1rem 1.5rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+/* ---------- Hero: the one number that matters ---------- */
+
+.hero__label {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--muted);
 }
+
+.hero__value {
+  margin: 0.25rem 0 0;
+  font-size: clamp(2rem, 6vw, 2.75rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+.hero__change {
+  margin: 0.375rem 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.hero__secondary {
+  margin: 0.75rem 0 0;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+
+.hero__secondary span:first-child {
+  font-weight: 600;
+}
+
+.hero__muted {
+  font-weight: 400;
+  color: var(--muted);
+}
+
+/* Hero used as a page header (holding detail) rather than inside a card */
+.hero--page {
+  margin-bottom: 1.5rem;
+}
+
+.holding-detail__ticker {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* ---------- Chart ---------- */
 
 .value-chart {
-  margin-top: 1rem;
-  padding: 1rem 1.5rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
+  margin-bottom: 1.5rem;
+  padding: 1.25rem 1.5rem;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+/* Inside the overview card the chart is just the lower half, no frame of its own */
+.overview-panel .value-chart {
+  margin: 1.25rem 0 0;
+  padding: 0;
+  border: none;
 }
 
 .value-chart__header {
@@ -136,250 +257,181 @@ body {
   justify-content: space-between;
   align-items: center;
   gap: 0.5rem;
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
 }
 
 .value-chart__title {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1rem;
 }
 
 .value-chart__ranges {
   display: flex;
-  gap: 0.25rem;
+  gap: 0.125rem;
+}
+
+/* Simple charts put the range picker below the line, out of the way */
+.value-chart--simple {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.value-chart--simple .value-chart__header {
+  margin: 0.5rem 0 0;
 }
 
 .value-chart__range {
-  padding: 0.25rem 0.75rem;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  padding: 0.25rem 0.625rem;
+  border: none;
+  border-radius: 999px;
   background: transparent;
   font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--muted);
   cursor: pointer;
 }
 
+.value-chart__range:hover {
+  color: var(--text);
+}
+
 .value-chart__range--active {
-  background: #2563eb;
-  border-color: #2563eb;
-  color: #fff;
+  background: var(--accent-soft);
+  color: var(--accent);
 }
 
 .value-chart__canvas {
   position: relative;
-  height: 300px;
+  height: 280px;
 }
 
-.summary-card__title {
-  margin: 0 0 1rem;
-  font-size: 1.1rem;
+.value-chart--simple .value-chart__canvas {
+  height: 160px;
 }
 
-.summary-card__stats {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 1.5rem;
+/* ---------- Lists (accounts, holdings) ---------- */
+
+.list-section {
+  margin-bottom: 1.5rem;
+}
+
+.list {
   margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 
-.summary-card__stat dt {
-  font-size: 0.85rem;
-  color: #666;
+.list li + li {
+  border-top: 1px solid var(--divider);
 }
 
-.summary-card__stat dd {
-  margin: 0.25rem 0 0;
-  font-size: 1.25rem;
+.list-row {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.875rem 1rem 0.875rem 1.25rem;
+  color: inherit;
+  text-decoration: none;
+}
+
+.list-row:hover {
+  background: #fafbfc;
+}
+
+.list-row:focus-visible {
+  outline-offset: -2px;
+}
+
+.list-row__main {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  flex: 1;
+}
+
+.list-row__title {
   font-weight: 600;
-  font-variant-numeric: tabular-nums;
 }
 
-.summary-card__stat--positive dd {
-  color: #1a7f37;
+/* Secondary facts (name, asset class) stay visible but quiet */
+.list-row__sub {
+  overflow: hidden;
+  font-size: 0.8rem;
+  color: var(--muted);
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
-.summary-card__stat--negative dd {
-  color: #c62828;
-}
-
-.holdings {
-  margin-top: 1.5rem;
-  padding: 1rem 1.5rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-.holdings__title {
-  margin: 0 0 1rem;
-  font-size: 1.1rem;
-}
-
-/* Wide table scrolls inside its card instead of the page on narrow screens */
-.holdings__scroll {
-  overflow-x: auto;
-}
-
-.holdings-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 0.9rem;
-}
-
-.holdings-table th,
-.holdings-table td {
-  padding: 0.5rem 0.75rem;
-  border-bottom: 1px solid #eee;
-  text-align: left;
+.list-row__figures {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
   white-space: nowrap;
 }
 
-.holdings-table thead th {
-  font-size: 0.8rem;
-  font-weight: 600;
-  color: #666;
-}
-
-.holdings-table tbody th {
-  font-weight: normal;
-}
-
-.holdings-table__ticker {
-  display: block;
+.list-row__value {
   font-weight: 600;
 }
 
-.holdings-table__name {
-  font-size: 0.8rem;
-  color: #666;
+.list-row__change {
+  font-size: 0.85rem;
+  font-weight: 500;
 }
 
-.holdings-table__num {
-  text-align: right;
-  font-variant-numeric: tabular-nums;
+.list-row__chevron {
+  font-size: 1.25rem;
+  color: #c4c8cf;
 }
 
-.holdings-table thead th:nth-child(n + 3) {
-  text-align: right;
+.list-row:hover .list-row__chevron {
+  color: var(--accent);
 }
 
-.holdings-table__num--positive {
-  color: #1a7f37;
-}
+/* ---------- Stats (holding detail) ---------- */
 
-.holdings-table__num--negative {
-  color: #c62828;
-}
-
-.holdings-table__empty {
-  text-align: center;
-  color: #666;
-}
-
-.account-tiles h2 {
-  margin: 1.5rem 0 0.75rem;
-}
-
-.account-tiles__grid {
+.stats {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-  gap: 1rem;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 1rem 1.5rem;
+  margin: 0;
 }
 
-.account-tile {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  padding: 1rem 1.25rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  color: inherit;
-  text-decoration: none;
+.stats--primary {
+  margin-bottom: 1.25rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid var(--divider);
 }
 
-.account-tile:hover,
-.account-tile:focus-visible {
-  border-color: #2563eb;
-  box-shadow: 0 0 0 1px #2563eb;
+.stat dt {
+  font-size: 0.8rem;
+  color: var(--muted);
 }
 
-.account-tile__label {
+.stat dd {
+  margin: 0.2rem 0 0;
   font-weight: 600;
+  color: var(--text);
 }
 
-.account-tile__value {
+.stat.trend--positive dd {
+  color: var(--positive);
+}
+
+.stat.trend--negative dd {
+  color: var(--negative);
+}
+
+.stats--primary .stat dd {
   font-size: 1.25rem;
 }
 
-.account-tile__change {
-  font-size: 0.875rem;
-}
-
-.account-tile__change--positive {
-  color: #1a7f37;
-}
-
-.account-tile__change--negative {
-  color: #c62828;
-}
-
-.back-link {
-  display: inline-block;
-  margin-bottom: 0.5rem;
-}
-
-.holdings-table__row--link {
-  cursor: pointer;
-}
-
-.holdings-table__row--link:hover {
-  background: #f5f8ff;
-}
-
-.holdings-table__row--link .holdings-table__ticker {
-  color: inherit;
-  text-decoration: none;
-}
-
-.holdings-table__row--link:hover .holdings-table__ticker,
-.holdings-table__row--link .holdings-table__ticker:focus-visible {
-  color: #2563eb;
-  text-decoration: underline;
-}
-
-.holding-detail__header {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  align-items: baseline;
-  gap: 0.5rem 1rem;
-  margin-bottom: 1rem;
-}
-
-.holding-detail__header h1 {
-  margin: 0;
-}
-
-.holding-detail__name {
-  margin-left: 0.75rem;
-  font-size: 1rem;
-  font-weight: normal;
-  color: #666;
-}
-
-.holding-detail__price {
-  margin: 0;
-  font-size: 1.5rem;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-}
-
-.holding-detail__cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 1rem;
-}
-
 .range-bar {
-  margin-top: 1.25rem;
+  margin-top: 1.5rem;
 }
 
 .range-bar__labels {
@@ -387,7 +439,12 @@ body {
   justify-content: space-between;
   gap: 1rem;
   font-size: 0.8rem;
-  color: #666;
+  color: var(--muted);
+}
+
+.range-bar__labels strong {
+  color: var(--text);
+  font-weight: 600;
 }
 
 .range-bar__track {
@@ -395,7 +452,7 @@ body {
   height: 6px;
   margin-top: 0.5rem;
   border-radius: 3px;
-  background: #e5e7eb;
+  background: var(--border);
 }
 
 .range-bar__marker {
@@ -403,33 +460,19 @@ body {
   top: 50%;
   width: 14px;
   height: 14px;
-  border: 2px solid #fff;
+  border: 2px solid var(--surface);
   border-radius: 50%;
-  background: #2563eb;
+  background: var(--accent);
   transform: translate(-50%, -50%);
 }
 
-/* Holdings | Breakdown switch on the account page (buttons reuse .value-chart__range) */
+/* ---------- Account positions: Holdings | Breakdown ---------- */
+
+/* Switch buttons reuse the chart's .value-chart__range pill style */
 .view-switch {
   display: flex;
-  gap: 0.25rem;
-  margin-top: 1.5rem;
-}
-
-.view-switch + .holdings,
-.view-switch + .allocation-chart {
-  margin-top: 0.75rem;
-}
-
-.allocation-chart {
-  padding: 1rem 1.5rem;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-}
-
-.allocation-chart__title {
-  margin: 0 0 1rem;
-  font-size: 1.1rem;
+  gap: 0.125rem;
+  margin-bottom: 0.75rem;
 }
 
 .allocation-chart__body {
@@ -441,8 +484,8 @@ body {
 
 .allocation-chart__canvas {
   position: relative;
-  width: 240px;
-  height: 240px;
+  width: 220px;
+  height: 220px;
   max-width: 100%;
 }
 
@@ -458,14 +501,18 @@ body {
   grid-template-columns: auto 1fr auto auto;
   align-items: center;
   gap: 0.75rem;
-  padding: 0.4rem 0;
-  border-bottom: 1px solid #eee;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--divider);
   font-variant-numeric: tabular-nums;
 }
 
+.allocation-chart__item:last-child {
+  border-bottom: none;
+}
+
 .allocation-chart__swatch {
-  width: 0.85rem;
-  height: 0.85rem;
+  width: 0.75rem;
+  height: 0.75rem;
   border-radius: 3px;
 }
 
@@ -475,7 +522,7 @@ body {
 }
 
 .allocation-chart__value {
-  min-width: 9rem;
+  min-width: 8.5rem;
   text-align: right;
-  color: #555;
+  color: var(--muted);
 }

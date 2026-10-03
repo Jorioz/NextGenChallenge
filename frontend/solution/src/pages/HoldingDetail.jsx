@@ -3,7 +3,7 @@ import { Link, useLocation, useParams } from 'react-router-dom'
 import HistoryChart from '../components/HistoryChart'
 import useCurrency from '../currency/useCurrency'
 import { fetchHoldingDetail } from '../portfolio/api'
-import { NOT_FOUND, formatNumber, formatPercent, isNumber, toPercent, trend } from '../portfolio/format'
+import { NOT_FOUND, TREND_ICON, formatNumber, formatPercent, isNumber, toPercent, trend, withSign } from '../portfolio/format'
 import { fromPriceHistory } from '../portfolio/history'
 import { PortfolioContext } from '../portfolio/PortfolioContext'
 
@@ -24,7 +24,7 @@ function formatDate(date) {
 // One labelled figure; `tone` (positive/negative/neutral) colours it like the summary card
 function Stat({ label, value, tone }) {
   return (
-    <div className={tone ? `summary-card__stat summary-card__stat--${tone}` : 'summary-card__stat'}>
+    <div className={tone ? `stat trend--${tone}` : 'stat'}>
       <dt>{label}</dt>
       <dd>{value}</dd>
     </div>
@@ -39,8 +39,8 @@ function RangeBar({ low, high, price, formatMoney }) {
   return (
     <div className="range-bar">
       <div className="range-bar__labels">
-        <span>52-week low {formatMoney(low)}</span>
-        <span>52-week high {formatMoney(high)}</span>
+        <span>52-week low <strong>{formatMoney(low)}</strong></span>
+        <span>52-week high <strong>{formatMoney(high)}</strong></span>
       </div>
       <div className="range-bar__track">
         {position !== null && (
@@ -117,63 +117,77 @@ export default function HoldingDetail() {
     (isNumber(price) && isNumber(totalCost) ? price * quantity - totalCost : null)
   const returnPercent = isNumber(gainLoss) && isNumber(totalCost) && totalCost !== 0 ? (gainLoss / totalCost) * 100 : null
 
+  const marketValue = holding?.marketValue ?? (isNumber(price) && isNumber(quantity) ? price * quantity : null)
+  // Holding dayChangePercent and weightPercent are already percents (2.4 => 2.4%), see PORTFOLIO-API.md
+  const dayPercent = holding?.dayChangePercent
+  const dayAmount = holding?.dayChangeAmount
+  const dayTone = trend(isNumber(dayAmount) ? dayAmount : dayPercent)
+  const hasDayChange = isNumber(dayAmount) || isNumber(dayPercent)
+
   return (
     <>
       {backLink}
-      <header className="holding-detail__header">
-        <h1>
-          {security.ticker}
-          <span className="holding-detail__name">{security.name}</span>
+      <header className="hero hero--page">
+        <h1 className="hero__label">
+          <span className="holding-detail__ticker">{security.ticker}</span> {security.name}
         </h1>
-        <p className="holding-detail__price">{formatMoney(price)}</p>
+        <p className="hero__value">{formatMoney(price)}</p>
+        {hasDayChange && (
+          <p className={`hero__change trend--${dayTone}`}>
+            {TREND_ICON[dayTone] && <span aria-hidden="true">{TREND_ICON[dayTone]} </span>}
+            {isNumber(dayAmount) && `${formatSignedMoney(dayAmount)} `}
+            ({withSign(dayPercent, formatPercent(dayPercent))})<span className="hero__muted"> today</span>
+          </p>
+        )}
       </header>
 
-      <div className="holding-detail__cards">
-        <section className="summary-card" aria-label="Your position">
-          <h2 className="summary-card__title">Your position</h2>
-          {isPortfolioCurrent && !holding ? (
-            <p>This account doesn't hold {ticker}.</p>
-          ) : (
-            <dl className="summary-card__stats">
-              <Stat label="Shares" value={orMissing(quantity, formatNumber)} />
-              <Stat label="Cost basis / share" value={formatMoney(costBasis)} />
-              <Stat label="Total cost" value={formatMoney(totalCost)} />
+      <HistoryChart histories={histories} title="Price history" />
+
+      <section className="card" aria-labelledby="position-title">
+        <h2 id="position-title" className="section-title">
+          Your position
+        </h2>
+        {isPortfolioCurrent && !holding ? (
+          <p>This account doesn't hold {ticker}.</p>
+        ) : (
+          <>
+            <dl className="stats stats--primary">
+              <Stat label="Market value" value={formatMoney(marketValue)} />
               <Stat
                 label="Unrealized gain/loss"
                 value={
                   isNumber(returnPercent)
-                    ? `${formatSignedMoney(gainLoss)} (${formatPercent(returnPercent)})`
+                    ? `${formatSignedMoney(gainLoss)} (${withSign(returnPercent, formatPercent(returnPercent))})`
                     : formatSignedMoney(gainLoss)
                 }
                 tone={trend(gainLoss)}
               />
+            </dl>
+            <dl className="stats">
+              <Stat label="Shares" value={orMissing(quantity, formatNumber)} />
+              <Stat label="Avg cost / share" value={formatMoney(costBasis)} />
+              <Stat label="Total cost" value={formatMoney(totalCost)} />
+              <Stat label="Weight in account" value={orMissing(holding?.weightPercent, formatPercent)} />
               <Stat label="Purchased" value={orMissing(security.purchaseDate, formatDate)} />
             </dl>
-          )}
-        </section>
+          </>
+        )}
+      </section>
 
-        <section className="summary-card" aria-label="Security details">
-          <h2 className="summary-card__title">Security details</h2>
-          <dl className="summary-card__stats">
-            <Stat label="Sector" value={security.sector ?? NOT_FOUND} />
-            <Stat label="Asset class" value={security.assetClass ?? NOT_FOUND} />
-            <Stat
-              label="Dividend yield"
-              value={isNumber(security.dividendYield) ? formatPercent(toPercent(security.dividendYield)) : 'None'}
-            />
-            <Stat label="52-week low" value={formatMoney(security.fiftyTwoWeekLow)} />
-            <Stat label="52-week high" value={formatMoney(security.fiftyTwoWeekHigh)} />
-          </dl>
-          <RangeBar
-            low={security.fiftyTwoWeekLow}
-            high={security.fiftyTwoWeekHigh}
-            price={price}
-            formatMoney={formatMoney}
+      <section className="card" aria-labelledby="about-title">
+        <h2 id="about-title" className="section-title">
+          About {security.ticker}
+        </h2>
+        <dl className="stats">
+          <Stat label="Asset class" value={security.assetClass ?? NOT_FOUND} />
+          <Stat label="Sector" value={security.sector ?? NOT_FOUND} />
+          <Stat
+            label="Dividend yield"
+            value={isNumber(security.dividendYield) ? formatPercent(toPercent(security.dividendYield)) : 'None'}
           />
-        </section>
-      </div>
-
-      <HistoryChart histories={histories} title="Price history" />
+        </dl>
+        <RangeBar low={security.fiftyTwoWeekLow} high={security.fiftyTwoWeekHigh} price={price} formatMoney={formatMoney} />
+      </section>
     </>
   )
 }
