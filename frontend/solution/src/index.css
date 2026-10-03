@@ -465,3 +465,64 @@ body {
   background: var(--accent);
   transform: translate(-50%, -50%);
 }
+
+/* ---------- Account positions: Holdings | Breakdown ---------- */
+
+/* Switch buttons reuse the chart's .value-chart__range pill style */
+.view-switch {
+  display: flex;
+  gap: 0.125rem;
+  margin-bottom: 0.75rem;
+}
+
+.allocation-chart__body {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.allocation-chart__canvas {
+  position: relative;
+  width: 220px;
+  height: 220px;
+  max-width: 100%;
+}
+
+.allocation-chart__legend {
+  flex: 1 1 260px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.allocation-chart__item {
+  display: grid;
+  grid-template-columns: auto 1fr auto auto;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--divider);
+  font-variant-numeric: tabular-nums;
+}
+
+.allocation-chart__item:last-child {
+  border-bottom: none;
+}
+
+.allocation-chart__swatch {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: 3px;
+}
+
+.allocation-chart__percent {
+  font-weight: 600;
+  text-align: right;
+}
+
+.allocation-chart__value {
+  min-width: 8.5rem;
+  text-align: right;
+  color: var(--muted);
+}
